@@ -6,6 +6,7 @@ public class Board {
 
     private final int depth = 5;
     private ArrayList<ArrayList<Boolean>> pegs; //true = peg in this location
+    private int numPegsOnBoard;
 
     Board(){
         pegs = new ArrayList<>();
@@ -18,6 +19,10 @@ public class Board {
         }
 
         setRandomPegEmpty();
+        numPegsOnBoard = 0;
+        for (int i = 0; i < depth; i++){
+            numPegsOnBoard += (1+i);
+        }
     }
 
     //sets a random peg
@@ -95,6 +100,17 @@ public class Board {
         }
 
         return false;
+    }
+
+    public void move(int startRow, int startCol, int endRow, int endCol){
+        if (canMove(startRow, startCol, endRow, endCol)){
+            int middleRow = getMiddle(startRow, endRow);
+            int middleCol = getMiddle(startCol, endCol);
+            pegs.get(startRow).set(startCol, false);
+            pegs.get(middleRow).set(middleCol, false);
+            pegs.get(endRow).set(endCol, true);
+            numPegsOnBoard--;
+        }
     }
 
 }
