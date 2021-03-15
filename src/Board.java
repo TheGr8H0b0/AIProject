@@ -31,6 +31,24 @@ public class Board {
         return pegs.get(row).get(col);
     }
 
-
+    public void setWithinReach(ArrayList<int []> withinReach, int row, int col){
+        withinReach = new ArrayList<>();
+        if (row + 2 < depth){
+            //add SW slot
+            withinReach.add(new int []{row+2, col});
+            if (col + 2 < depth){
+                //add SE slot
+                withinReach.add(new int[]{row+2, col+2});
+            }
+        }
+        if (row - 2 >= 0){
+            //add NE slot
+            withinReach.add(new int []{row-2, col});
+            if (col - 2 >= 0){
+                //add NW slot
+                withinReach.add(new int[]{row-2, col-2});
+            }
+        }
+    }
 
 }
