@@ -1,14 +1,17 @@
+package src;
+
 import java.util.Random;
 import java.util.ArrayList;
 import java.lang.Math;
 
 public class Board {
 
-    private final int depth = 5;
+    private int depth;
     private ArrayList<ArrayList<Boolean>> pegs; //true = peg in this location
     private int numPegsOnBoard;
 
-    Board(){
+    Board(int size){
+        this.depth = size;
         pegs = new ArrayList<>();
         for (int i = 0; i < depth; i++){
             ArrayList <Boolean> row = new ArrayList<>();
@@ -19,7 +22,25 @@ public class Board {
         }
 
         setRandomPegEmpty();
-        numPegsOnBoard = 0;
+        numPegsOnBoard = -1;
+        for (int i = 0; i < depth; i++){
+            numPegsOnBoard += (1+i);
+        }
+    }
+
+    Board(int size, int [] emptyPeg){
+        this.depth = size;
+        pegs = new ArrayList<>();
+        for (int i = 0; i < depth; i++){
+            ArrayList <Boolean> row = new ArrayList<>();
+            for (int j = 0; j < i; j++){
+                row.add(true);
+            }
+            pegs.add(row);
+        }
+
+        pegs.get(emptyPeg[0]).set(emptyPeg[1], false);
+        numPegsOnBoard = -1;
         for (int i = 0; i < depth; i++){
             numPegsOnBoard += (1+i);
         }
@@ -42,7 +63,7 @@ public class Board {
         if (row + 2 < depth){
             //add SW slot
             withinReach.add(new int []{row+2, col});
-            if (col + 2 < depth){
+            if (col + 2 <= row + 2){
                 //add SE slot
                 withinReach.add(new int[]{row+2, col+2});
             }
@@ -54,6 +75,12 @@ public class Board {
                 //add NW slot
                 withinReach.add(new int[]{row-2, col-2});
             }
+        }
+        if (col - 2 >= 0) {
+            withinReach.add(new int[] {row, col-2});
+        }
+        if (col + 2 <= row) {
+            withinReach.add(new int[] {row, col+2});
         }
     }
 
@@ -82,8 +109,13 @@ public class Board {
         if (pegExists(endRow, endCol)){
             return false;
         }
-        //start and end location cannot be the same
-        if ((startRow == endRow) && (startCol == endCol)){
+        //Start and end location must be different
+        if (startRow == endRow && startCol == endCol) {
+            return false;
+        }
+        //start and end location must be greater than 1 unit away
+        if ((startRow + 1 <= endRow || startRow - 1 >= endRow) 
+            || (startCol + 1 <= endCol || startCol -1 >= endCol)){
             return false;
         }
 
@@ -95,7 +127,7 @@ public class Board {
             return false;
         }
 
-        if (pegExists(middleRow, middleCol)){
+        if (pegExists(middleRow, middleCol)) {
             return true;
         }
 
@@ -112,5 +144,4 @@ public class Board {
             numPegsOnBoard--;
         }
     }
-
 }
