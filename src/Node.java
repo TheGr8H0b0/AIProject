@@ -1,12 +1,12 @@
-import java.util.Queue;
+import java.util.ArrayList;
 
 public class Node {
 
     public Board currentState;
-    public Queue<Board> path;
+    public ArrayList<Board> path;
     public Board next;
 
-    public Node(Board state, Queue<Board> path){
+    public Node(Board state, ArrayList<Board> path){
         currentState = state;
         this.path = path;
         next = null;   
