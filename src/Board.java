@@ -1,5 +1,6 @@
 import java.util.Random;
 import java.util.ArrayList;
+import java.lang.Math;
 
 public class Board {
 
@@ -49,6 +50,51 @@ public class Board {
                 withinReach.add(new int[]{row-2, col-2});
             }
         }
+    }
+
+    //can be used for getting row and column
+    private int getMiddle(int start, int end){
+        if ((Math.abs(start - end) != 2) && (start != end)){
+            return -1;
+        }
+        if (start > end){
+            return start-1;
+        }
+        else if (start < end){
+            return start+1;
+        }
+        else{
+            return start;
+        }
+    }
+
+    public boolean canMove(int startRow, int startCol, int endRow, int endCol){
+        //there needs to be a peg in the starting position
+        if (pegExists(startRow, startCol) == false){
+            return false;
+        }
+        //there cannot be a peg in the ending position
+        if (pegExists(endRow, endCol)){
+            return false;
+        }
+        //start and end location cannot be the same
+        if ((startRow == endRow) && (startCol == endCol)){
+            return false;
+        }
+
+        int middleRow = getMiddle(startRow, endRow);
+        int middleCol = getMiddle(startCol, endCol);
+
+        //peg is not two slots away
+        if ((middleRow == -1) || middleCol == -1){
+            return false;
+        }
+
+        if (pegExists(middleRow, middleCol)){
+            return true;
+        }
+
+        return false;
     }
 
 }
