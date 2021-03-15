@@ -1,8 +1,5 @@
-package src;
-
 import java.util.Random;
 import java.util.ArrayList;
-import java.lang.Math;
 
 public class Board {
 
@@ -44,6 +41,10 @@ public class Board {
         for (int i = 0; i < depth; i++){
             numPegsOnBoard += (1+i);
         }
+    }
+
+    public int getNumPegs(){
+        return numPegsOnBoard;
     }
 
     //sets a random peg
