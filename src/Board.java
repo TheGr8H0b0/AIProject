@@ -83,7 +83,7 @@ public class Board {
         return new int[]{rowNum, colNum};
     }
 
-    private boolean pegExists(int row, int col){
+    public boolean pegExists(int row, int col){
         try {
             return pegs.get(row).get(col);
         } catch(IndexOutOfBoundsException e) {
@@ -123,17 +123,11 @@ public class Board {
             withinReach.add(new int[] {row, col - 2});
         }
 
-        System.out.println(withinReach.size());
-
-        for (int i = 0; i < withinReach.size(); i++){
-            System.out.println(withinReach.get(i));
-        }
         return withinReach;
     }
 
     //can be used for getting row and column
     private int getMiddle(int start, int end){
-        System.out.println(Math.abs(start-end));
         if (Math.abs(start - end) != 2 && (start != end)){
             return -1;
         }
@@ -149,6 +143,11 @@ public class Board {
     }
 
     public boolean canMove(int startRow, int startCol, int endRow, int endCol){
+        //out of bounds
+        if ((endRow < 0) || (endRow >= depth) || (endCol < 0) || (endCol > endRow)){
+            return false;
+        }
+        
         //there needs to be a peg in the starting position
         if (pegExists(startRow, startCol) == false){
             return false;
