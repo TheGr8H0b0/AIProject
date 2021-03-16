@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-=======
-package src;
 
->>>>>>> 4e55ad4fd55996349c0ca07c5159d11780df131b
 import java.util.ArrayList;
 
 public class PegSolitaireSolver {
@@ -32,9 +28,8 @@ public class PegSolitaireSolver {
             //cycle through all pegs to find possible moves
             for (int i = 0; i < boardDepth; i++){
                 for (int j = 0; j <= i; j++){
-                    ArrayList <int []> withinReach = new ArrayList<>();
+                    ArrayList <int []> withinReach = queueHead.currentState.getWithinReach(i, j);
                     //for each peg, add states for all possible moves to queue
-                    queueHead.currentState.setWithinReach(withinReach, i, j);
                     for (int k = 0; k < withinReach.size(); k++){
                         int row = withinReach.get(k)[0];
                         int col = withinReach.get(k)[1];

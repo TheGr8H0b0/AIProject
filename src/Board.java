@@ -1,4 +1,3 @@
-package src;
 
 import java.util.Random;
 import java.util.ArrayList;
@@ -82,14 +81,6 @@ public class Board {
         }
     }
 
-    public void setWithinReach(ArrayList<int []> withinReach, int row, int col){
-        if (row + 2 < depth){
-            //add SW slot
-            withinReach.add(new int []{row+2, col});
-            if (col + 2 <= row + 2){
-                //add SE slot
-                withinReach.add(new int[]{row+2, col+2});
-            }
     public ArrayList<int []> getWithinReach(int row, int col){
         ArrayList<int []> withinReach = new ArrayList<>();
         //Check SW Slot
