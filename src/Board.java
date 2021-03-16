@@ -91,8 +91,29 @@ public class Board {
         }
     }
 
+    //returns only pegs you can move to
     public ArrayList<int []> getWithinReach(int row, int col){
         ArrayList<int []> withinReach = new ArrayList<>();
+        //Check NW Slot
+        if (canMove(row, col, row - 2, col-2)) {
+            withinReach.add(new int[] {row - 2, col - 2});
+        }
+
+        //Check NE Slot
+        if (canMove(row, col, row - 2, col)) {
+            withinReach.add(new int[] {row - 2, col});
+        }
+
+        //Check W Slot
+        if (canMove(row, col, row, col - 2)) {
+            withinReach.add(new int[] {row, col - 2});
+        }
+
+        //Check E Slot
+        if (canMove(row, col, row, col + 2)) {
+            withinReach.add(new int[] {row, col + 2});
+        }
+        
         //Check SW Slot
         if (canMove(row, col, row + 2, col)) {
             withinReach.add(new int[] {row + 2, col});
@@ -101,26 +122,6 @@ public class Board {
         //Check SE Slot
         if (canMove(row, col, row + 2, col + 2)) {
             withinReach.add(new int[] {row + 2, col + 2});
-        }
-
-        //Check NW Slot
-        if (canMove(row, col, row - 2, col)) {
-            withinReach.add(new int[] {row - 2, col});
-        }
-
-        //Check NE Slot
-        if (canMove(row, col, row - 2, col)) {
-            withinReach.add(new int[] {row - 2, col - 2});
-        }
-
-        //Check E Slot
-        if (canMove(row, col, row, col + 2)) {
-            withinReach.add(new int[] {row, col + 2});
-        }
-
-        //Check W Slot
-        if (canMove(row, col, row, col - 2)) {
-            withinReach.add(new int[] {row, col - 2});
         }
 
         return withinReach;
