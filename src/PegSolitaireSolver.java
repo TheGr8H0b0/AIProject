@@ -23,6 +23,10 @@ public class PegSolitaireSolver {
                 return queueHead;
             }
 
+            //queueHead.currentState.printBoard();
+        
+            System.out.println("loop ran");
+
             //get possible next states
             
             //cycle through all pegs to find possible moves
@@ -31,15 +35,22 @@ public class PegSolitaireSolver {
                     ArrayList <int []> withinReach = queueHead.currentState.getWithinReach(i, j);
                     //for each peg, add states for all possible moves to queue
                     for (int k = 0; k < withinReach.size(); k++){
+                        System.out.println(withinReach.get(k));
+                    }
+                    for (int k = 0; k < withinReach.size(); k++){
                         int row = withinReach.get(k)[0];
                         int col = withinReach.get(k)[1];
+                        //possible move == new state
                         if (queueHead.currentState.canMove(i, j, row, col)){
-                            //add new state to queue
+                            //create new state
                             Board newState = new Board(queueHead.currentState);
+                            newState.printBoard();
                             newState.move(i, j, row, col);
+                            //get path to new state
                             ArrayList <Board> newPath = new ArrayList<>(queueHead.path);
                             newPath.add(newState);
                             Node newNode = new Node(newState, newPath);
+                            //add new state to queue
                             queueEnd.next = newNode;
                             queueEnd = newNode;
                         }

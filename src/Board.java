@@ -48,8 +48,18 @@ public class Board {
 
     Board(Board old){
         this.depth = old.depth;
-        this.pegs = new ArrayList<>(old.pegs);
         this.numPegsOnBoard = old.numPegsOnBoard;
+        this.initialEmpty = old.initialEmpty;
+
+        this.pegs = new ArrayList<>();
+        //copy over pegs
+        for (int i = 0; i < depth; i++){
+            ArrayList <Boolean> row = new ArrayList<>();
+            for (int j = 0; j <= i; j++){
+                row.add(old.pegExists(i, j));
+            }
+            pegs.add(row);
+        }
     }
 
     public int getNumPegs(){
@@ -112,12 +122,19 @@ public class Board {
         if (canMove(row, col, row, col - 2)) {
             withinReach.add(new int[] {row, col - 2});
         }
+
+        System.out.println(withinReach.size());
+
+        for (int i = 0; i < withinReach.size(); i++){
+            System.out.println(withinReach.get(i));
+        }
         return withinReach;
     }
 
     //can be used for getting row and column
     private int getMiddle(int start, int end){
-        if ((Math.abs(start - end) != 2) || (start == end)){
+        System.out.println(Math.abs(start-end));
+        if (Math.abs(start - end) != 2 && (start != end)){
             return -1;
         }
         if (start > end){
@@ -142,12 +159,6 @@ public class Board {
         }
         //Start and end location must be different
         if (startRow == endRow && startCol == endCol) {
-            return false;
-        }
-        //start and end location must be greater 2 units away in any of the 6 movement directions
-        if (!(Math.abs(startRow - endRow) == 2 && Math.abs(startCol - endCol) == 0)
-            || !(Math.abs(startRow - endRow) == 2 && Math.abs(startCol - endCol) == 2)
-            || !(Math.abs(startRow - endRow) == 0 && Math.abs(startCol - endCol) == 2)) {
             return false;
         }
 
