@@ -11,7 +11,7 @@ public class PegSolitaireSolver {
         boardDepth = depth;
     }
 
-    public void breadthFirstSearch(){
+    public Node breadthFirstSearch(){
         ArrayList <Board> path = new ArrayList<>();
         path.add(initialState);
         Node queueHead = new Node(initialState, path);
@@ -20,7 +20,7 @@ public class PegSolitaireSolver {
         while (queueHead != null){
 
             if (queueHead.currentState.getNumPegs() == 1){
-                //reached goal state
+                return queueHead;
             }
 
             //get possible next states
@@ -50,6 +50,9 @@ public class PegSolitaireSolver {
             //pop off head
             queueHead = queueHead.next;
         }
+
+        //if we're here, there's no solution
+        return null;
     }
 
     public class biNode {
