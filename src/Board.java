@@ -14,7 +14,7 @@ public class Board {
         pegs = new ArrayList<>();
         for (int i = 0; i < depth; i++){
             ArrayList <Boolean> row = new ArrayList<>();
-            for (int j = 0; j < i; j++){
+            for (int j = 0; j <= i; j++){
                 row.add(true);
             }
             pegs.add(row);
@@ -28,12 +28,12 @@ public class Board {
     }
 
     Board(int size, int [] emptyPeg){
-        this.depth = size;
-        this.initialEmpty = emptyPeg;
+        depth = size;
+        initialEmpty = emptyPeg;
         pegs = new ArrayList<>();
         for (int i = 0; i < depth; i++){
             ArrayList <Boolean> row = new ArrayList<>();
-            for (int j = 0; j < i; j++){
+            for (int j = 0; j <= i; j++){
                 row.add(true);
             }
             pegs.add(row);
@@ -174,6 +174,36 @@ public class Board {
             pegs.get(middleRow).set(middleCol, false);
             pegs.get(endRow).set(endCol, true);
             numPegsOnBoard--;
+        }
+    }
+
+    public void printBoard(){
+        for (int i = 0; i < depth; i++){
+            String row = "";
+            //build left empty slot
+            int j;
+            for (j = i; j < depth - 1; j++){
+                row = row + " ";
+            }
+            //fill pegs
+            char marker;    //X if there's a peg here, O otherwise
+            for (j = 0; j < i; j++){
+                if (pegExists(i, j)){
+                    marker = 'X';
+                }
+                else{
+                    marker = 'O';
+                }
+                row = row + marker + " ";
+            }
+            if (pegExists(i, j)){
+                marker = 'X';
+            }
+            else{
+                marker = 'O';
+            }
+            row = row + marker;
+            System.out.println(row);
         }
     }
 }
