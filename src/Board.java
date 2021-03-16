@@ -1,3 +1,5 @@
+package src;
+
 import java.util.Random;
 import java.util.ArrayList;
 
@@ -6,6 +8,7 @@ public class Board {
     private int depth;
     private ArrayList<ArrayList<Boolean>> pegs; //true = peg in this location
     private int numPegsOnBoard;
+    private int[] initialEmpty;
 
     Board(int size){
         this.depth = size;
@@ -18,7 +21,7 @@ public class Board {
             pegs.add(row);
         }
 
-        setRandomPegEmpty();
+        this.initialEmpty = setRandomPegEmpty();
         numPegsOnBoard = -1;
         for (int i = 0; i < depth; i++){
             numPegsOnBoard += (1+i);
@@ -27,6 +30,7 @@ public class Board {
 
     Board(int size, int [] emptyPeg){
         this.depth = size;
+        this.initialEmpty = emptyPeg;
         pegs = new ArrayList<>();
         for (int i = 0; i < depth; i++){
             ArrayList <Boolean> row = new ArrayList<>();
@@ -47,47 +51,68 @@ public class Board {
         return numPegsOnBoard;
     }
 
+    public int getDepth() {
+        return depth;
+    }
+
+    public int[] getInitialEmpty() {
+        return initialEmpty;
+    }
+
     //sets a random peg
-    private void setRandomPegEmpty(){
+    private int [] setRandomPegEmpty(){
         Random rand = new Random();
         int rowNum = rand.nextInt(depth);
         int colNum = rand.nextInt(rowNum);
         pegs.get(rowNum).set(colNum, false);
+        return new int[]{rowNum, colNum};
     }
 
     private boolean pegExists(int row, int col){
-        return pegs.get(row).get(col);
+        try {
+            return pegs.get(row).get(col);
+        } catch(IndexOutOfBoundsException e) {
+            return false;
+        }
     }
 
-    public void setWithinReach(ArrayList<int []> withinReach, int row, int col){
-        withinReach = new ArrayList<>();
-        if (row + 2 < depth){
-            //add SW slot
-            withinReach.add(new int []{row+2, col});
-            if (col + 2 <= row + 2){
-                //add SE slot
-                withinReach.add(new int[]{row+2, col+2});
-            }
+    public ArrayList<int []> getWithinReach(int row, int col){
+        ArrayList<int []> withinReach = new ArrayList<>();
+        //Check SW Slot
+        if (canMove(row, col, row + 2, col)) {
+            withinReach.add(new int[] {row + 2, col});
         }
-        if (row - 2 >= 0){
-            //add NE slot
-            withinReach.add(new int []{row-2, col});
-            if (col - 2 >= 0){
-                //add NW slot
-                withinReach.add(new int[]{row-2, col-2});
-            }
+
+        //Check SE Slot
+        if (canMove(row, col, row + 2, col + 2)) {
+            withinReach.add(new int[] {row + 2, col + 2});
         }
-        if (col - 2 >= 0) {
-            withinReach.add(new int[] {row, col-2});
+
+        //Check NW Slot
+        if (canMove(row, col, row - 2, col)) {
+            withinReach.add(new int[] {row - 2, col});
         }
-        if (col + 2 <= row) {
-            withinReach.add(new int[] {row, col+2});
+
+        //Check NE Slot
+        if (canMove(row, col, row - 2, col)) {
+            withinReach.add(new int[] {row - 2, col - 2});
         }
+
+        //Check E Slot
+        if (canMove(row, col, row, col + 2)) {
+            withinReach.add(new int[] {row, col + 2});
+        }
+
+        //Check W Slot
+        if (canMove(row, col, row, col - 2)) {
+            withinReach.add(new int[] {row, col - 2});
+        }
+        return withinReach;
     }
 
     //can be used for getting row and column
     private int getMiddle(int start, int end){
-        if ((Math.abs(start - end) != 2) && (start != end)){
+        if ((Math.abs(start - end) != 2) || (start == end)){
             return -1;
         }
         if (start > end){
@@ -114,9 +139,10 @@ public class Board {
         if (startRow == endRow && startCol == endCol) {
             return false;
         }
-        //start and end location must be greater than 1 unit away
-        if ((startRow + 1 <= endRow || startRow - 1 >= endRow) 
-            || (startCol + 1 <= endCol || startCol -1 >= endCol)){
+        //start and end location must be greater 2 units away in any of the 6 movement directions
+        if (!(Math.abs(startRow - endRow) == 2 && Math.abs(startCol - endCol) == 0)
+            || !(Math.abs(startRow - endRow) == 2 && Math.abs(startCol - endCol) == 2)
+            || !(Math.abs(startRow - endRow) == 0 && Math.abs(startCol - endCol) == 2)) {
             return false;
         }
 
