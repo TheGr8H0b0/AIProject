@@ -43,6 +43,12 @@ public class Board {
         }
     }
 
+    Board(Board old){
+        this.depth = old.depth;
+        this.pegs = new ArrayList<>(old.pegs);
+        this.numPegsOnBoard = old.numPegsOnBoard;
+    }
+
     public int getNumPegs(){
         return numPegsOnBoard;
     }
@@ -60,7 +66,6 @@ public class Board {
     }
 
     public void setWithinReach(ArrayList<int []> withinReach, int row, int col){
-        withinReach = new ArrayList<>();
         if (row + 2 < depth){
             //add SW slot
             withinReach.add(new int []{row+2, col});
