@@ -52,12 +52,12 @@ public class PegSolitaireSolver {
         }
     }
 
-    public class Node {
+    public class biNode {
 
         private Board currentState;
         private Board parent;
     
-        public Node(Board state, Board parent){
+        public biNode(Board state, Board parent){
             currentState = state;
             this.parent = parent;
         }
@@ -85,7 +85,7 @@ public class PegSolitaireSolver {
         }
     }
 
-    public Node bidirectionalSearchRecursive(Node head) {
+    public biNode bidirectionalSearchRecursive(biNode head) {
         int numPegs = head.getState().getNumPegs();
         int depth = head.getState().getDepth();
 
@@ -104,7 +104,7 @@ public class PegSolitaireSolver {
             }
         }
 
-        return new Node(null, null);
+        return new biNode(null, null);
     }
     
 }
