@@ -1,3 +1,4 @@
+package src;
 
 import java.util.ArrayList;
 
@@ -6,9 +7,9 @@ public class PegSolitaireSolver {
     Board initialState;
     int boardDepth;
 
-    PegSolitaireSolver(Board initialState, int depth){
+    PegSolitaireSolver(Board initialState){
         this.initialState = initialState;
-        boardDepth = depth;
+        boardDepth = initialState.getDepth();
     }
 
     public Node breadthFirstSearch(){
@@ -59,24 +60,47 @@ public class PegSolitaireSolver {
         return null;
     }
 
-    public class biNode {
+    public Node depthFirstSearch(){
+        ArrayList <Board> path = new ArrayList<>();
+        path.add(initialState);
 
-        private Board currentState;
-        private Board parent;
-    
-        public biNode(Board state, Board parent){
-            currentState = state;
-            this.parent = parent;
+        //if we're here, there's no solution
+        return depthFirstSearchRecursive(new Node(initialState, path));
+    }
+
+    private Node depthFirstSearchRecursive(Node state) {
+        if (state.currentState.getNumPegs() == 1) {
+            return state;
         }
 
-        public Board getState() {
-            return currentState;
+        for (int i = 0; i < boardDepth; i++){
+            for (int j = 0; j <= i; j++) {
+                if (state.currentState.pegExists(i, j)) {
+                    ArrayList <int []> withinReach = state.currentState.getWithinReach(i, j);
+                    //for each peg, add states for all possible moves to queue
+                    for (int k = 0; k < withinReach.size(); k++){ 
+                        ArrayList <Board> newPath = new ArrayList<>(state.path);
+                        int row = withinReach.get(k)[0];
+                        int col = withinReach.get(k)[1];
+                        //possible move == new state
+                        //create new state
+                        Board newState = new Board(state.currentState);
+                        newState.move(i, j, row, col);
+                        //get path to new state
+                        newPath.add(newState);
+                        Node newNode = new Node(newState, newPath);
+
+                        //Check out the 
+                        Node result = depthFirstSearchRecursive(newNode);
+                        if (result != null  && result.currentState.getNumPegs() == 1) {
+                            return result;
+                        }
+                    }
+                }
+            }
         }
 
-        public Board getParent() {
-            return parent;
-        }
-        
+        return null;
     }
 
     public void bidirectionalSearch(){
@@ -92,26 +116,33 @@ public class PegSolitaireSolver {
         }
     }
 
-    public biNode bidirectionalSearchRecursive(biNode head) {
-        int numPegs = head.getState().getNumPegs();
-        int depth = head.getState().getDepth();
+    public Node bidirectionalSearchRecursive(Node head) {
+        int numPegs = head.currentState.getNumPegs();
+        int depth = head.currentState.getDepth();
 
         if (numPegs == 1) {
             return head;
         }
 
         //Build the list of potential moves from the current state
-        ArrayList<int []> pegJumpList = new ArrayList<int []>();
         for (int i = 0; i < depth; i++) {
             for (int j = 0; j <= i; j++) {
-                ArrayList<int []> tempJumpList = initialState.getWithinReach(i, j);
-                for (int k  = 0; k < tempJumpList.size(); k++) {
-                    pegJumpList.add(tempJumpList.get(k));
+                if (head.currentState.pegExists(i, j)){
+                    ArrayList<int []> tempJumpList = initialState.getWithinReach(i, j);
+                    for (int k  = 0; k < tempJumpList.size(); k++) {
+                        int row = tempJumpList.get(k)[0];
+                        int col = tempJumpList.get(k)[1];
+                        //possible move == new state
+                        //create new state
+                        Board newState = new Board(head.currentState);
+                        newState.move(i, j, row, col);
+                        Node newNode = new Node(newState, head.path);
+                    }
                 }
             }
         }
 
-        return new biNode(null, null);
+        return new Node(null, null);
     }
     
 }
