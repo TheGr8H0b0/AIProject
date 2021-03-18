@@ -88,22 +88,28 @@ public class Game {
             }
         }
 
-        //DFS For 8-sides
-        // PegSolitaireSolver eightSolver = new PegSolitaireSolver(new Board(8, emptyPeg));
-        // startTime = System.currentTimeMillis();
-        // answer = eightSolver.depthFirstSearch();
-        // endTime = System.currentTimeMillis();
-        // times.add((endTime - startTime));
+        //BiDirectional 5
+        startTime = System.currentTimeMillis();
+        answer = solver.bidirectionalSearch();
+        endTime = System.currentTimeMillis();
+        times.add((endTime - startTime));
 
-        // System.out.println("Solution: ");
-        // if (answer != null) {
-        //     answer.currentState.printBoard();
-        //     System.out.println("Path: ");
-        //     for (int i = 0; i < answer.path.size(); i++){
-        //         System.out.println(i + ")");
-        //         answer.path.get(i).printBoard();
-        //     }
-        // }
+        System.out.println("Solution for BiDirectional: ");
+        if (answer != null) {
+            answer.currentState.printBoard();
+            System.out.println("Path: ");
+            for (int i = 0; i < answer.path.size(); i++){
+                System.out.println(i + ")");
+                answer.path.get(i).printBoard();
+            }
+        }
+
+        //BiDirectional 6
+        /*
+            Also runs out of memory, just like BFS on 6
+            Took about 123 seconds, which is longer than BFS 
+                - This displays the fact that BFS uses more memory than BiDirectional 
+        */
 
         
         for (int i = 0; i < times.size(); i++) {

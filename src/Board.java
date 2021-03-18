@@ -14,7 +14,7 @@ public class Board {
         this.depth = size;
         pegs = new ArrayList<>();
         for (int i = 0; i < depth; i++){
-            ArrayList <Boolean> row = new ArrayList<>();
+            ArrayList <Boolean> row = new ArrayList<>(depth);
             for (int j = 0; j <= i; j++){
                 row.add(true);
             }
@@ -33,7 +33,7 @@ public class Board {
         initialEmpty = emptyPeg;
         pegs = new ArrayList<>();
         for (int i = 0; i < depth; i++){
-            ArrayList <Boolean> row = new ArrayList<>();
+            ArrayList <Boolean> row = new ArrayList<>(depth);
             for (int j = 0; j <= i; j++){
                 row.add(true);
             }
@@ -55,12 +55,28 @@ public class Board {
         this.pegs = new ArrayList<>();
         //copy over pegs
         for (int i = 0; i < depth; i++){
-            ArrayList <Boolean> row = new ArrayList<>();
+            ArrayList <Boolean> row = new ArrayList<>(i+1);
             for (int j = 0; j <= i; j++){
                 row.add(old.pegExists(i, j));
             }
             pegs.add(row);
         }
+    }
+
+    Board(int [] pegSetters, int size) {
+        this.depth = size;
+        this.numPegsOnBoard = 1;
+        this.pegs = new ArrayList<>(size);
+
+        for (int i = 0; i < depth; i++){
+            ArrayList <Boolean> row = new ArrayList<>();
+            for (int j = 0; j <= i; j++){
+                row.add(false);
+            }
+            pegs.add(row);
+        }
+
+        pegs.get(pegSetters[0]).set(pegSetters[1], true);
     }
 
     public int getNumPegs(){
@@ -94,7 +110,7 @@ public class Board {
 
     //returns only pegs you can move to
     public ArrayList<int []> getWithinReach(int row, int col){
-        ArrayList<int []> withinReach = new ArrayList<>();
+        ArrayList<int []> withinReach = new ArrayList<>(6);
         //Check NW Slot
         if (canMove(row, col, row - 2, col-2)) {
             withinReach.add(new int[] {row - 2, col - 2});
@@ -144,6 +160,42 @@ public class Board {
         }
     }
 
+    //returns only pegs you can move to
+    public ArrayList<int []> getWithinReachBackwards(int row, int col){
+        ArrayList<int []> withinReach = new ArrayList<>(6);
+        //Check NW Slot
+        if (canMoveBackwards(row, col, row - 2, col-2)) {
+            withinReach.add(new int[] {row - 2, col - 2});
+        }
+
+        //Check NE Slot
+        if (canMoveBackwards(row, col, row - 2, col)) {
+            withinReach.add(new int[] {row - 2, col});
+        }
+
+        //Check W Slot
+        if (canMoveBackwards(row, col, row, col - 2)) {
+            withinReach.add(new int[] {row, col - 2});
+        }
+
+        //Check E Slot
+        if (canMoveBackwards(row, col, row, col + 2)) {
+            withinReach.add(new int[] {row, col + 2});
+        }
+        
+        //Check SW Slot
+        if (canMoveBackwards(row, col, row + 2, col)) {
+            withinReach.add(new int[] {row + 2, col});
+        }
+
+        //Check SE Slot
+        if (canMoveBackwards(row, col, row + 2, col + 2)) {
+            withinReach.add(new int[] {row + 2, col + 2});
+        }
+
+        return withinReach;
+    }
+
     public boolean canMove(int startRow, int startCol, int endRow, int endCol){
         //out of bounds
         if ((endRow < 0) || (endRow >= depth) || (endCol < 0) || (endCol > endRow)){
@@ -176,6 +228,52 @@ public class Board {
         }
 
         return false;
+    }
+
+    public boolean canMoveBackwards(int startRow, int startCol, int endRow, int endCol){
+        //out of bounds
+        if ((endRow < 0) || (endRow >= depth) || (endCol < 0) || (endCol > endRow)){
+            return false;
+        }
+        
+        //there needs to be a peg in the starting position
+        if (!pegExists(startRow, startCol)){
+            return false;
+        }
+        //there cannot be a peg in the ending position
+        if (pegExists(endRow, endCol)){
+            return false;
+        }
+        //Start and end location must be different
+        if (startRow == endRow && startCol == endCol) {
+            return false;
+        }
+
+        int middleRow = getMiddle(startRow, endRow);
+        int middleCol = getMiddle(startCol, endCol);
+
+        //peg is not two slots away
+        if ((middleRow == -1) || middleCol == -1){
+            return false;
+        }
+
+        //There is NO peg in the middle, so we can perform a reverse move
+        if (!pegExists(middleRow, middleCol)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public void moveBackwards(int startRow, int startCol, int endRow, int endCol){
+        if (canMoveBackwards(startRow, startCol, endRow, endCol)){
+            int middleRow = getMiddle(startRow, endRow);
+            int middleCol = getMiddle(startCol, endCol);
+            pegs.get(startRow).set(startCol, false);
+            pegs.get(middleRow).set(middleCol, true);
+            pegs.get(endRow).set(endCol, true);
+            numPegsOnBoard++;
+        }
     }
 
     public void move(int startRow, int startCol, int endRow, int endCol){
@@ -217,5 +315,16 @@ public class Board {
             row = row + marker;
             System.out.println(row);
         }
+    }
+
+    public boolean compareTo(Board other) {
+        for (int i = 0; i < depth; i++) {
+            for (int j = 0; j <= i; j++) {
+                if (pegExists(i, j) != other.pegExists(i, j)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

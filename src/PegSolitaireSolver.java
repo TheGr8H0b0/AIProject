@@ -103,46 +103,117 @@ public class PegSolitaireSolver {
         return null;
     }
 
-    public void bidirectionalSearch(){
-        /*
-        Bidirectional search implementation here
-        */
-        int[] initEmpty = initialState.getInitialEmpty();
-        ArrayList<int []> potentialStartPegs = initialState.getWithinReach(initEmpty[0], initEmpty[1]);
-        Node head = new Node(initialState, null);
+    public Node bidirectionalSearch(){
+        ArrayList <Board> path = new ArrayList<>();
+        path.add(initialState);
 
-        for (int i = 0; i < potentialStartPegs.size(); i++) {
+        //List of all our edge nodes from the search
+        ArrayList<Node> edgeNodes = new ArrayList<>();
 
+        //Queue Nodes
+        Node queueHead = new Node(initialState, path);
+        Node queueEnd = queueHead;
+
+        int halfMovesDown = (initialState.getNumPegs() + 1) / 2;
+        int halfMovesUp = (initialState.getNumPegs()) / 2;
+        
+        //Normal BFS up to halfway
+        while (queueHead != null){
+            if (queueHead.currentState.getNumPegs() == halfMovesDown){
+                edgeNodes.add(queueHead);
+            } else {
+                //cycle through all pegs to find possible moves
+                for (int i = 0; i < boardDepth; i++){
+                    for (int j = 0; j <= i; j++){
+                        if (queueHead.currentState.pegExists(i, j)){
+                            ArrayList <int []> withinReach = queueHead.currentState.getWithinReach(i, j);
+                            //for each peg, add states for all possible moves to queue
+                            for (int k = 0; k < withinReach.size(); k++){
+                                int row = withinReach.get(k)[0];
+                                int col = withinReach.get(k)[1];
+                                //possible move == new state
+                                //create new state
+                                Board newState = new Board(queueHead.currentState);
+                                newState.move(i, j, row, col);
+                                //get path to new state
+                                ArrayList <Board> newPath = new ArrayList<>(queueHead.path);
+                                newPath.add(newState);
+                                Node newNode = new Node(newState, newPath);
+                                //add new state to queue
+                                queueEnd.next = newNode;
+                                queueEnd = newNode;
+                            }
+                        }
+                    }
+                    
+                }
+            }
+            //pop off head
+            queueHead = queueHead.next;
         }
-    }
 
-    public Node bidirectionalSearchRecursive(Node head) {
-        int numPegs = head.currentState.getNumPegs();
-        int depth = head.currentState.getDepth();
-
-        if (numPegs == 1) {
-            return head;
-        }
-
-        //Build the list of potential moves from the current state
-        for (int i = 0; i < depth; i++) {
+        ArrayList<Node> endStateQueueList = new ArrayList<>(initialState.getNumPegs() + 1);
+        //Make Queue Nodes for every end point
+        for (int i = 0; i < boardDepth; i++) {
             for (int j = 0; j <= i; j++) {
-                if (head.currentState.pegExists(i, j)){
-                    ArrayList<int []> tempJumpList = initialState.getWithinReach(i, j);
-                    for (int k  = 0; k < tempJumpList.size(); k++) {
-                        int row = tempJumpList.get(k)[0];
-                        int col = tempJumpList.get(k)[1];
-                        //possible move == new state
-                        //create new state
-                        Board newState = new Board(head.currentState);
-                        newState.move(i, j, row, col);
-                        Node newNode = new Node(newState, head.path);
+                ArrayList<Board> tempPath = new ArrayList<>(halfMovesUp);
+                Board tempBoard = new Board(new int[] {i, j}, boardDepth);
+                tempPath.add(tempBoard);
+                Node temp = new Node(tempBoard, tempPath);
+                endStateQueueList.add(temp);
+            }
+        }
+        
+        for (int x = 0; x < endStateQueueList.size(); x++) {
+            queueHead = endStateQueueList.get(x);
+            queueEnd = queueHead;
+            while (queueHead != null){
+                if (queueHead.currentState.getNumPegs() == halfMovesUp){
+                    for (int i = 0; i < edgeNodes.size(); i++) {
+                        if (queueHead.currentState.compareTo(edgeNodes.get(i).currentState)) {
+                            ArrayList<Board> finalPath = new ArrayList<>();
+                            finalPath.addAll(edgeNodes.get(i).path);
+                            for (int j = queueHead.path.size() - 2; j >= 0; j--) {
+                                finalPath.add(queueHead.path.get(j));
+                            }
+                            Node finalNode = new Node(queueHead.path.get(0), finalPath);
+                            return finalNode;
+                        }
+                    }
+                } else {
+                    //cycle through all pegs to find possible moves
+                    for (int i = 0; i < boardDepth; i++){
+                        for (int j = 0; j <= i; j++){
+                            if (queueHead.currentState.pegExists(i, j)){
+                                ArrayList <int []> withinReach = queueHead.currentState.getWithinReachBackwards(i, j);
+                                //for each peg, add states for all possible moves to queue
+                                for (int k = 0; k < withinReach.size(); k++){
+                                    int row = withinReach.get(k)[0];
+                                    int col = withinReach.get(k)[1];
+                                    //possible move == new state
+                                    //create new state
+                                    Board newState = new Board(queueHead.currentState);
+                                    newState.moveBackwards(i, j, row, col);
+                                    //get path to new state
+                                    ArrayList <Board> newPath = new ArrayList<>(queueHead.path);
+                                    newPath.add(newState);
+                                    Node newNode = new Node(newState, newPath);
+                                    //add new state to queue
+                                    queueEnd.next = newNode;
+                                    queueEnd = newNode;
+                                }
+                            }
+                        }
+                        
                     }
                 }
+                //pop off head
+                queueHead = queueHead.next;
             }
         }
 
-        return new Node(null, null);
-    }
-    
+        //if we're here, there's no solution
+        System.out.println(edgeNodes.size());
+        return null;
+    }    
 }
