@@ -1,6 +1,5 @@
 package src;
 
-import java.sql.Date;
 import java.util.ArrayList;
 
 public class Game {
@@ -44,25 +43,8 @@ public class Game {
 
         //DFS For 7-sides
         /*
-            I ran DFS Search and got no result for over 30 minutes.
-            I will try again to get a result when I have more time to run the test.
+            I ran DFS Search and got no result for over 70 minutes.
         */
-        Board sevenBoard = new Board(7, emptyPeg);
-        PegSolitaireSolver sevenSolver = new PegSolitaireSolver(sevenBoard);
-        // startTime = System.currentTimeMillis();
-        // answer = sevenSolver.depthFirstSearch();
-        // endTime = System.currentTimeMillis();
-        // times.add((endTime - startTime));
-
-        // System.out.println("Solution: ");
-        // if (answer != null) {
-        //     answer.currentState.printBoard();
-        //     System.out.println("Path: ");
-        //     for (int i = 0; i < answer.path.size(); i++){
-        //         System.out.println(i + ")");
-        //         answer.path.get(i).printBoard();
-        //     }
-        // }
 
         //BiDirectional 5
         startTime = System.currentTimeMillis();

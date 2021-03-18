@@ -225,7 +225,7 @@ public class PegSolitaireSolver {
         searchQueue.add(new Node(initialState, path));
 
         Node currentNode = searchQueue.poll();
-		// Make sure the end of our path is not Bucharest and set cityName
+
 		while (currentNode.currentState.getNumPegs() != 1) {
 			for (int i = 0; i < boardDepth; i++){
                 for (int j = 0; j <= i; j++){
@@ -248,7 +248,6 @@ public class PegSolitaireSolver {
                 }
             }
 
-			// Grab the next city in the search and the path that it took to get there
 			currentNode = searchQueue.poll();
 		}
 
