@@ -10,7 +10,7 @@ public class Game {
     private static Node answer = null;
     
     public static void main(String args[]) {
-        runBFS(5, 20, false);
+        runBFS(5, 2, false);
         runDFS(5, 20, false);
         runDFS(6, 20, false);
         runBiDirSearch(5, 20, false);
@@ -104,7 +104,8 @@ public class Game {
             average += times.get(i);
             if (temp > worst) {
                 worst = temp;
-            } else if (best > temp) {
+            } 
+            if (best > temp) {
                 best = temp;
             }
         }
