@@ -108,7 +108,7 @@ public class PegSolitaireSolver {
         ArrayList <Board> path = new ArrayList<>();
         path.add(initialState);
 
-        //List of all our edge nodes from the search
+        //List of all our edge nodes from the first half of the search
         ArrayList<Node> edgeNodes = new ArrayList<>();
 
         //Queue Nodes

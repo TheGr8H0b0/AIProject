@@ -31,9 +31,6 @@ public class Board implements Comparable<Board> {
 
     //Constructor that will set a peg at the given coordinates as empty (Throws an error if that coordinate does not exist)
     Board(int size, int [] emptyPeg){
-        if (emptyPeg[0] >= depth || emptyPeg[1] > pegs.get(emptyPeg[0]).size()) {
-            throw new Error("The given coordinates for the empty peg do not exist");
-        }
         depth = size;
         initialEmpty = emptyPeg;
         pegs = new ArrayList<>();
@@ -45,6 +42,9 @@ public class Board implements Comparable<Board> {
             pegs.add(row);
         }
 
+        if (emptyPeg[0] >= depth || emptyPeg[1] > pegs.get(emptyPeg[0]).size()) {
+            throw new Error("The given coordinates for the empty peg do not exist");
+        }
         pegs.get(emptyPeg[0]).set(emptyPeg[1], false);
         numPegsOnBoard = -1;
         for (int i = 0; i < depth; i++){
@@ -74,9 +74,6 @@ public class Board implements Comparable<Board> {
         Throws an error if that coordinate does not exist
     */
     Board(int [] pegSetters, int size) {
-        if (pegSetters[0] >= depth || pegSetters[1] > pegs.get(pegSetters[0]).size()) {
-            throw new Error("The given coordinates for the empty peg do not exist");
-        }
         this.depth = size;
         this.numPegsOnBoard = 1;
         this.pegs = new ArrayList<>(size);
@@ -89,6 +86,9 @@ public class Board implements Comparable<Board> {
             pegs.add(row);
         }
         
+        if (pegSetters[0] >= depth || pegSetters[1] > pegs.get(pegSetters[0]).size()) {
+            throw new Error("The given coordinates for the empty peg do not exist");
+        }
         pegs.get(pegSetters[0]).set(pegSetters[1], true);
     }
 
