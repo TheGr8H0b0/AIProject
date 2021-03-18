@@ -10,6 +10,7 @@ public class Board implements Comparable<Board> {
     private int numPegsOnBoard;
     private int[] initialEmpty;
 
+    //Constructor that will set a random peg as empty
     Board(int size){
         this.depth = size;
         pegs = new ArrayList<>();
@@ -28,7 +29,11 @@ public class Board implements Comparable<Board> {
         }
     }
 
+    //Constructor that will set a peg at the given coordinates as empty (Throws an error if that coordinate does not exist)
     Board(int size, int [] emptyPeg){
+        if (emptyPeg[0] >= depth || emptyPeg[1] > pegs.get(emptyPeg[0]).size()) {
+            throw new Error("The given coordinates for the empty peg do not exist");
+        }
         depth = size;
         initialEmpty = emptyPeg;
         pegs = new ArrayList<>();
@@ -47,6 +52,7 @@ public class Board implements Comparable<Board> {
         }
     }
 
+    //Constructor that will copy a previously supplied board state
     Board(Board old){
         this.depth = old.depth;
         this.numPegsOnBoard = old.numPegsOnBoard;
@@ -63,7 +69,14 @@ public class Board implements Comparable<Board> {
         }
     }
 
+    /*
+        Constructor that will create an empty board and put one peg onto the board at the given slot.
+        Throws an error if that coordinate does not exist
+    */
     Board(int [] pegSetters, int size) {
+        if (pegSetters[0] >= depth || pegSetters[1] > pegs.get(pegSetters[0]).size()) {
+            throw new Error("The given coordinates for the empty peg do not exist");
+        }
         this.depth = size;
         this.numPegsOnBoard = 1;
         this.pegs = new ArrayList<>(size);
@@ -75,7 +88,7 @@ public class Board implements Comparable<Board> {
             }
             pegs.add(row);
         }
-
+        
         pegs.get(pegSetters[0]).set(pegSetters[1], true);
     }
 
@@ -91,15 +104,16 @@ public class Board implements Comparable<Board> {
         return initialEmpty;
     }
 
-    //sets a random peg
+    //sets a random peg to be empty
     private int [] setRandomPegEmpty(){
         Random rand = new Random();
         int rowNum = rand.nextInt(depth);
-        int colNum = rand.nextInt(rowNum);
+        int colNum = rand.nextInt(rowNum + 1);
         pegs.get(rowNum).set(colNum, false);
         return new int[]{rowNum, colNum};
     }
 
+    //Returns if a peg exists at the given location. (All non-existant locations return false)
     public boolean pegExists(int row, int col){
         try {
             return pegs.get(row).get(col);
@@ -108,7 +122,7 @@ public class Board implements Comparable<Board> {
         }
     }
 
-    //returns only pegs you can move to
+    //Returns an ArrayList of coordinates of the positions you can move to
     public ArrayList<int []> getWithinReach(int row, int col){
         ArrayList<int []> withinReach = new ArrayList<>(6);
         //Check NW Slot
@@ -144,7 +158,11 @@ public class Board implements Comparable<Board> {
         return withinReach;
     }
 
-    //can be used for getting row and column
+    /*
+        Grabs the value in between the supplied start and end points.
+        This is used to grab the middle peg after a jump has been performed
+        ** Returns -1 if the supplied coordinates do not have a single space between them
+    */
     private int getMiddle(int start, int end){
         if (Math.abs(start - end) != 2 && (start != end)){
             return -1;
@@ -160,7 +178,42 @@ public class Board implements Comparable<Board> {
         }
     }
 
-    //returns only pegs you can move to
+    //Returns true if the given end positions can be jumped to
+    public boolean canMove(int startRow, int startCol, int endRow, int endCol){
+        //out of bounds
+        if ((endRow < 0) || (endRow >= depth) || (endCol < 0) || (endCol > endRow)){
+            return false;
+        }
+        
+        //there needs to be a peg in the starting position
+        if (pegExists(startRow, startCol) == false){
+            return false;
+        }
+        //there cannot be a peg in the ending position
+        if (pegExists(endRow, endCol)){
+            return false;
+        }
+        //Start and end location must be different
+        if (startRow == endRow && startCol == endCol) {
+            return false;
+        }
+
+        int middleRow = getMiddle(startRow, endRow);
+        int middleCol = getMiddle(startCol, endCol);
+
+        //peg is not two slots away
+        if ((middleRow == -1) || middleCol == -1){
+            return false;
+        }
+
+        if (pegExists(middleRow, middleCol)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    //Returns an ArrayList of coordinates for the positions you can have moved from (For BiDirectional)
     public ArrayList<int []> getWithinReachBackwards(int row, int col){
         ArrayList<int []> withinReach = new ArrayList<>(6);
         //Check NW Slot
@@ -196,40 +249,7 @@ public class Board implements Comparable<Board> {
         return withinReach;
     }
 
-    public boolean canMove(int startRow, int startCol, int endRow, int endCol){
-        //out of bounds
-        if ((endRow < 0) || (endRow >= depth) || (endCol < 0) || (endCol > endRow)){
-            return false;
-        }
-        
-        //there needs to be a peg in the starting position
-        if (pegExists(startRow, startCol) == false){
-            return false;
-        }
-        //there cannot be a peg in the ending position
-        if (pegExists(endRow, endCol)){
-            return false;
-        }
-        //Start and end location must be different
-        if (startRow == endRow && startCol == endCol) {
-            return false;
-        }
-
-        int middleRow = getMiddle(startRow, endRow);
-        int middleCol = getMiddle(startCol, endCol);
-
-        //peg is not two slots away
-        if ((middleRow == -1) || middleCol == -1){
-            return false;
-        }
-
-        if (pegExists(middleRow, middleCol)) {
-            return true;
-        }
-
-        return false;
-    }
-
+    //Returns true if the given end positions can be jumped from (For BiDirectional)
     public boolean canMoveBackwards(int startRow, int startCol, int endRow, int endCol){
         //out of bounds
         if ((endRow < 0) || (endRow >= depth) || (endCol < 0) || (endCol > endRow)){
@@ -265,6 +285,7 @@ public class Board implements Comparable<Board> {
         return false;
     }
 
+    //Performs a backwards move, placing IN a peg in the middle position
     public void moveBackwards(int startRow, int startCol, int endRow, int endCol){
         if (canMoveBackwards(startRow, startCol, endRow, endCol)){
             int middleRow = getMiddle(startRow, endRow);
@@ -276,10 +297,10 @@ public class Board implements Comparable<Board> {
         }
     }
 
-    public ArrayList<ArrayList<Double>> getWeights() {
-        ArrayList<ArrayList<Double>> weights = new ArrayList<>();
+    //Calculates the heuristic for the given board (For A-Star Search)
+    public double getWeight() {
+        double weight = 0;
         for (int i = 0; i < depth; i++) {
-            ArrayList<Double> row = new ArrayList<>();
             for (int j = 0; j <= i; j++) {
                 int denom = 0;
                 if (pegExists(i, j)) {
@@ -315,17 +336,16 @@ public class Board implements Comparable<Board> {
                 }
 
                 if (denom == 0) {
-                    row.add(0.0);
+                    weight += 0.0;
                 } else {
-                    Double heuristic = 1.0 / denom;
-                    row.add(heuristic);
+                    weight += (1.0 / denom);
                 }
             }
-            weights.add(row);
         }
-        return weights;
+        return weight;
     }
 
+    //Performs a move on the board, REMOVING the middle peg between start and end positions
     public void move(int startRow, int startCol, int endRow, int endCol){
         if (canMove(startRow, startCol, endRow, endCol)){
             int middleRow = getMiddle(startRow, endRow);
@@ -337,6 +357,7 @@ public class Board implements Comparable<Board> {
         }
     }
 
+    //Prints out the board in a human-readable format
     public void printBoard(){
         for (int i = 0; i < depth; i++){
             String row = "";
@@ -367,24 +388,10 @@ public class Board implements Comparable<Board> {
         }
     }
 
+    //Overriding the compare method so that one Board can be easily compared to another (For A-Star)
     @Override
     public int compareTo(Board other) {
-        ArrayList<ArrayList<Double>> weightList = getWeights();
-        Double weightSumPrimary = 0.0;
-        for (int i = 0; i < depth; i++) {
-            for (int j = 0; j <= i; j++) {
-                weightSumPrimary += weightList.get(i).get(j);
-            }
-        }
-
-        weightList = other.getWeights();
-        Double weightSumSecondary = 0.0;
-        for (int i = 0; i < depth; i++) {
-            for (int j = 0; j <= i; j++) {
-                weightSumSecondary += weightList.get(i).get(j);
-            }
-        }
-        double weightDifference = weightSumPrimary - weightSumSecondary;
+        double weightDifference = getWeight() - other.getWeight();
         if (weightDifference < 0) {
             return -1;
         } else if (weightDifference > 0) {

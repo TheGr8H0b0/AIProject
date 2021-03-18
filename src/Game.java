@@ -3,91 +3,118 @@ package src;
 import java.util.ArrayList;
 
 public class Game {
+
+    private static ArrayList<Long> times = new ArrayList<>();
+    private static long startTime = 0;
+    private static long endTime = 0;
+    private static Node answer = null;
     
     public static void main(String args[]) {
-        
-        int[] emptyPeg = {0,0};
-        ArrayList<Long> times = new ArrayList<>();
-        Board startBoard = new Board(5, emptyPeg);
-        PegSolitaireSolver solver = new PegSolitaireSolver(startBoard);
-
-        Board sixBoard = new Board(6, emptyPeg);
-        PegSolitaireSolver sixSolver = new PegSolitaireSolver(sixBoard);
-
-        long startTime = System.currentTimeMillis();
-        Node answer = solver.breadthFirstSearch();
-        long endTime = System.currentTimeMillis();
-        times.add((endTime - startTime));
-        printSolution(answer);
-        
-        //BFS For 6-sides
-        /*
-            I ran BFS for 6-sides and we ran out of heap space (Java OutOfMemoryError)
-            It took about 75 seconds to run out of heap space
-        */
-
-
-        //DFS For 5-sides
-        startTime = System.currentTimeMillis();
-        answer = solver.depthFirstSearch();
-        endTime = System.currentTimeMillis();
-        times.add((endTime - startTime));
-        printSolution(answer);
-
-        //DFS For 6-sides
-        startTime = System.currentTimeMillis();
-        answer = sixSolver.depthFirstSearch();
-        endTime = System.currentTimeMillis();
-        times.add((endTime - startTime));
-        printSolution(answer);
-
-        //DFS For 7-sides
-        /*
-            I ran DFS Search and got no result for over 70 minutes.
-        */
-
-        //BiDirectional 5
-        startTime = System.currentTimeMillis();
-        answer = solver.bidirectionalSearch();
-        endTime = System.currentTimeMillis();
-        times.add((endTime - startTime));
-        printSolution(answer);
-
-        //BiDirectional 6
-        /*
-            Also runs out of memory, just like BFS on 6
-            Took about 123 seconds, which is longer than BFS 
-                - This displays the fact that BFS uses more memory than BiDirectional 
-        */
-
-
-        //AStarSearch
-        System.out.println("AStarSearch");
-        startTime = System.currentTimeMillis();
-        answer = solver.AStarSearch();
-        endTime = System.currentTimeMillis();
-        times.add((endTime - startTime));
-        printSolution(answer);
-
-        //AStarSearch 6
-        System.out.println("AStarSearch");
-        startTime = System.currentTimeMillis();
-        answer = sixSolver.AStarSearch();
-        endTime = System.currentTimeMillis();
-        times.add((endTime - startTime));
-        printSolution(answer);
-
-        //AStarSearch 7
-        /*
-            I ran this algorithm for 27 minutes and no result
-        */
-        
-        for (int i = 0; i < times.size(); i++) {
-            System.out.println("Process " + i + " took: " + (times.get(i)/1000.0) + " seconds");
-        }
+        runBFS(5, 20, false);
+        runDFS(5, 20, false);
+        runDFS(6, 20, false);
+        runBiDirSearch(5, 20, false);
+        runAStar(5, 20, false);
+        runAStar(6, 20, false);
     }
 
-    private static void printSolution(Node answer) {
+    //Run BFS the given number of times on the given board size. Print out each path if printPath == true 
+    private static void runBFS(int boardSize, int repititions, boolean printPath) {
+        for (int i = 0; i < repititions; i++) {
+            Board tempBoard = new Board(boardSize);
+            PegSolitaireSolver tempSolver = new PegSolitaireSolver(tempBoard);
+            startTime = System.currentTimeMillis();
+            answer = tempSolver.breadthFirstSearch();
+            endTime = System.currentTimeMillis();
+            times.add((endTime - startTime));
+            if (printPath) {
+                printSolutionAndPath(answer);
+            }
+        }
+        //Print space between results
+        System.out.println("\n\n");
+        getAverageWorstAndBest(times, "Breadth-First Search with size " + boardSize);
+        times = new ArrayList<>();
+    }
+
+    //Run A-Star Search the given number of times on the given board size. Print out each path if printPath == true
+    private static void runAStar(int boardSize, int repititions, boolean printPath) {
+        for (int i = 0; i < repititions; i++) {
+            Board tempBoard = new Board(boardSize);
+            PegSolitaireSolver tempSolver = new PegSolitaireSolver(tempBoard);
+            startTime = System.currentTimeMillis();
+            answer = tempSolver.AStarSearch();
+            endTime = System.currentTimeMillis();
+            times.add((endTime - startTime));
+            if (printPath) {
+                printSolutionAndPath(answer);
+            }
+        }
+        //Print space between results
+        System.out.println("\n\n");
+        getAverageWorstAndBest(times, "A* Search with size " + boardSize);
+        times = new ArrayList<>();
+    }
+
+    //Run BiDirectional Search the given number of times on the given board size. Print out each path if printPath == true
+    private static void runBiDirSearch(int boardSize, int repititions, boolean printPath) {
+        for (int i = 0; i < repititions; i++) {
+            Board tempBoard = new Board(boardSize);
+            PegSolitaireSolver tempSolver = new PegSolitaireSolver(tempBoard);
+            startTime = System.currentTimeMillis();
+            answer = tempSolver.bidirectionalSearch();
+            endTime = System.currentTimeMillis();
+            times.add((endTime - startTime));
+            if (printPath) {
+                printSolutionAndPath(answer);
+            }
+        }
+        //Print space between results
+        System.out.println("\n\n");
+        getAverageWorstAndBest(times, "BiDirectional Search with size " + boardSize);
+        times = new ArrayList<>();
+    }
+
+    //Run DFS the given number of times on the given board size. Print out each path if printPath == true
+    private static void runDFS(int boardSize, int repititions, boolean printPath) {
+        for (int i = 0; i < repititions; i++) {
+            Board tempBoard = new Board(boardSize);
+            PegSolitaireSolver tempSolver = new PegSolitaireSolver(tempBoard);
+            startTime = System.currentTimeMillis();
+            answer = tempSolver.depthFirstSearch();
+            endTime = System.currentTimeMillis();
+            times.add((endTime - startTime));
+            if (printPath) {
+                printSolutionAndPath(answer);
+            }
+        }
+        //Print space between results
+        System.out.println("\n\n");
+        getAverageWorstAndBest(times, "Depth-First Search with size " + boardSize);
+        times = new ArrayList<>();
+    }
+
+    //Print out the average, worst, and best runtimes for the given set of times
+    private static void getAverageWorstAndBest(ArrayList<Long> times, String test) {
+        long average = 0;
+        long worst = 0;
+        long best = Long.MAX_VALUE;
+        for (int i = 0; i < times.size(); i++) {
+            long temp = times.get(i);
+            average += times.get(i);
+            if (temp > worst) {
+                worst = temp;
+            } else if (best > temp) {
+                best = temp;
+            }
+        }
+        System.out.println(test + " took " + average / times.size() + " milliseconds on average.");
+        System.out.println(test + " took  " + worst + " milliseconds at the worst.");
+        System.out.println(test + " took  " + best + " milliseconds at the best.");
+    }
+
+    //Print out the Final Solution of the given answer as well as the path to get there. 
+    private static void printSolutionAndPath(Node answer) {
         System.out.println("Solution: ");
         if (answer != null) {
             answer.currentState.printBoard();
