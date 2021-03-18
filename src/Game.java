@@ -19,13 +19,7 @@ public class Game {
         Node answer = solver.breadthFirstSearch();
         long endTime = System.currentTimeMillis();
         times.add((endTime - startTime));
-        System.out.println("Solution: ");
-        answer.currentState.printBoard();
-        System.out.println("Path: ");
-        for (int i = 0; i < answer.path.size(); i++){
-            System.out.println(i + ")");
-            answer.path.get(i).printBoard();
-        }
+        printSolution(answer);
         
         //BFS For 6-sides
         /*
@@ -39,32 +33,14 @@ public class Game {
         answer = solver.depthFirstSearch();
         endTime = System.currentTimeMillis();
         times.add((endTime - startTime));
-
-        System.out.println("Solution: ");
-        if (answer != null) {
-            answer.currentState.printBoard();
-            System.out.println("Path: ");
-            for (int i = 0; i < answer.path.size(); i++){
-                System.out.println(i + ")");
-                answer.path.get(i).printBoard();
-            }
-        }
+        printSolution(answer);
 
         //DFS For 6-sides
         startTime = System.currentTimeMillis();
         answer = sixSolver.depthFirstSearch();
         endTime = System.currentTimeMillis();
         times.add((endTime - startTime));
-
-        System.out.println("Solution: ");
-        if (answer != null) {
-            answer.currentState.printBoard();
-            System.out.println("Path: ");
-            for (int i = 0; i < answer.path.size(); i++){
-                System.out.println(i + ")");
-                answer.path.get(i).printBoard();
-            }
-        }
+        printSolution(answer);
 
         //DFS For 7-sides
         /*
@@ -73,36 +49,27 @@ public class Game {
         */
         Board sevenBoard = new Board(7, emptyPeg);
         PegSolitaireSolver sevenSolver = new PegSolitaireSolver(sevenBoard);
-        startTime = System.currentTimeMillis();
-        answer = sevenSolver.depthFirstSearch();
-        endTime = System.currentTimeMillis();
-        times.add((endTime - startTime));
+        // startTime = System.currentTimeMillis();
+        // answer = sevenSolver.depthFirstSearch();
+        // endTime = System.currentTimeMillis();
+        // times.add((endTime - startTime));
 
-        System.out.println("Solution: ");
-        if (answer != null) {
-            answer.currentState.printBoard();
-            System.out.println("Path: ");
-            for (int i = 0; i < answer.path.size(); i++){
-                System.out.println(i + ")");
-                answer.path.get(i).printBoard();
-            }
-        }
+        // System.out.println("Solution: ");
+        // if (answer != null) {
+        //     answer.currentState.printBoard();
+        //     System.out.println("Path: ");
+        //     for (int i = 0; i < answer.path.size(); i++){
+        //         System.out.println(i + ")");
+        //         answer.path.get(i).printBoard();
+        //     }
+        // }
 
         //BiDirectional 5
         startTime = System.currentTimeMillis();
         answer = solver.bidirectionalSearch();
         endTime = System.currentTimeMillis();
         times.add((endTime - startTime));
-
-        System.out.println("Solution for BiDirectional: ");
-        if (answer != null) {
-            answer.currentState.printBoard();
-            System.out.println("Path: ");
-            for (int i = 0; i < answer.path.size(); i++){
-                System.out.println(i + ")");
-                answer.path.get(i).printBoard();
-            }
-        }
+        printSolution(answer);
 
         //BiDirectional 6
         /*
@@ -111,9 +78,42 @@ public class Game {
                 - This displays the fact that BFS uses more memory than BiDirectional 
         */
 
+
+        //AStarSearch
+        System.out.println("AStarSearch");
+        startTime = System.currentTimeMillis();
+        answer = solver.AStarSearch();
+        endTime = System.currentTimeMillis();
+        times.add((endTime - startTime));
+        printSolution(answer);
+
+        //AStarSearch 6
+        System.out.println("AStarSearch");
+        startTime = System.currentTimeMillis();
+        answer = sixSolver.AStarSearch();
+        endTime = System.currentTimeMillis();
+        times.add((endTime - startTime));
+        printSolution(answer);
+
+        //AStarSearch 7
+        /*
+            I ran this algorithm for 27 minutes and no result
+        */
         
         for (int i = 0; i < times.size(); i++) {
             System.out.println("Process " + i + " took: " + (times.get(i)/1000.0) + " seconds");
+        }
+    }
+
+    private static void printSolution(Node answer) {
+        System.out.println("Solution: ");
+        if (answer != null) {
+            answer.currentState.printBoard();
+            System.out.println("Path: ");
+            for (int i = 0; i < answer.path.size(); i++){
+                System.out.println(i + ")");
+                answer.path.get(i).printBoard();
+            }
         }
     }
 }

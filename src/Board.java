@@ -3,7 +3,7 @@ package src;
 import java.util.Random;
 import java.util.ArrayList;
 
-public class Board {
+public class Board implements Comparable<Board> {
 
     private int depth;
     private ArrayList<ArrayList<Boolean>> pegs; //true = peg in this location
@@ -276,6 +276,56 @@ public class Board {
         }
     }
 
+    public ArrayList<ArrayList<Double>> getWeights() {
+        ArrayList<ArrayList<Double>> weights = new ArrayList<>();
+        for (int i = 0; i < depth; i++) {
+            ArrayList<Double> row = new ArrayList<>();
+            for (int j = 0; j <= i; j++) {
+                int denom = 0;
+                if (pegExists(i, j)) {
+                    //Check if peg is next to corner (WORST)
+                    if ((j == 1 && i == 1) || (j == 0 && i == 1)) {
+                        denom = 1;
+                    }
+                    else if ((j == i - 1 && i == depth - 1) || (j == 0 && i == depth - 1)) {
+                        denom = 1;
+                    }
+                    else if ((j == 1 && i == depth) || (j == 1 && i == depth)) {
+                        denom = 1;
+                    }
+                    //Check if peg is on corner (Kinda bad)
+                    else if (j == 0 && i == 0) {
+                        denom = 2;
+                    }
+                    else if (j == i && i == depth) {
+                        denom = 2;
+                    }
+                    else if (j == 0 && i == depth) {
+                        denom = 2;
+                    }
+                    //Check if peg is on side (Not too bad) 
+                    else if (j == 0) {
+                        denom = 3;
+                    }
+                    else if (j == i) {
+                        denom = 3;
+                    } else {
+                        denom = 4;
+                    }
+                }
+
+                if (denom == 0) {
+                    row.add(0.0);
+                } else {
+                    Double heuristic = 1.0 / denom;
+                    row.add(heuristic);
+                }
+            }
+            weights.add(row);
+        }
+        return weights;
+    }
+
     public void move(int startRow, int startCol, int endRow, int endCol){
         if (canMove(startRow, startCol, endRow, endCol)){
             int middleRow = getMiddle(startRow, endRow);
@@ -317,14 +367,29 @@ public class Board {
         }
     }
 
-    public boolean compareTo(Board other) {
+    @Override
+    public int compareTo(Board other) {
+        ArrayList<ArrayList<Double>> weightList = getWeights();
+        Double weightSumPrimary = 0.0;
         for (int i = 0; i < depth; i++) {
             for (int j = 0; j <= i; j++) {
-                if (pegExists(i, j) != other.pegExists(i, j)) {
-                    return false;
-                }
+                weightSumPrimary += weightList.get(i).get(j);
             }
         }
-        return true;
+
+        weightList = other.getWeights();
+        Double weightSumSecondary = 0.0;
+        for (int i = 0; i < depth; i++) {
+            for (int j = 0; j <= i; j++) {
+                weightSumSecondary += weightList.get(i).get(j);
+            }
+        }
+        double weightDifference = weightSumPrimary - weightSumSecondary;
+        if (weightDifference < 0) {
+            return -1;
+        } else if (weightDifference > 0) {
+            return 1;
+        }
+        return 0;
     }
 }

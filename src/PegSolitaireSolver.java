@@ -1,6 +1,7 @@
 package src;
 
 import java.util.ArrayList;
+import java.util.PriorityQueue;
 
 public class PegSolitaireSolver {
 
@@ -170,7 +171,7 @@ public class PegSolitaireSolver {
             while (queueHead != null){
                 if (queueHead.currentState.getNumPegs() == halfMovesUp){
                     for (int i = 0; i < edgeNodes.size(); i++) {
-                        if (queueHead.currentState.compareTo(edgeNodes.get(i).currentState)) {
+                        if (queueHead.currentState.compareTo(edgeNodes.get(i).currentState) == 0) {
                             ArrayList<Board> finalPath = new ArrayList<>();
                             finalPath.addAll(edgeNodes.get(i).path);
                             for (int j = queueHead.path.size() - 2; j >= 0; j--) {
@@ -215,5 +216,42 @@ public class PegSolitaireSolver {
         //if we're here, there's no solution
         System.out.println(edgeNodes.size());
         return null;
-    }    
+    } 
+    
+    public Node AStarSearch() {
+        PriorityQueue<Node> searchQueue = new PriorityQueue<Node>();
+        ArrayList<Board> path = new ArrayList<>();
+        path.add(initialState);
+        searchQueue.add(new Node(initialState, path));
+
+        Node currentNode = searchQueue.poll();
+		// Make sure the end of our path is not Bucharest and set cityName
+		while (currentNode.currentState.getNumPegs() != 1) {
+			for (int i = 0; i < boardDepth; i++){
+                for (int j = 0; j <= i; j++){
+                    if (currentNode.currentState.pegExists(i, j)){
+                        ArrayList <int []> withinReach = currentNode.currentState.getWithinReach(i, j);
+                        //for each peg, add states for all possible moves to queue
+                        for (int k = 0; k < withinReach.size(); k++){
+                            int row = withinReach.get(k)[0];
+                            int col = withinReach.get(k)[1];
+                            
+                            Board newState = new Board(currentNode.currentState);
+                            newState.move(i, j, row, col);
+                            //get path to new state
+                            ArrayList <Board> newPath = new ArrayList<>(currentNode.path);
+                            newPath.add(newState);
+                            Node newNode = new Node(newState, newPath);
+                            searchQueue.add(newNode);
+                        }
+                    }
+                }
+            }
+
+			// Grab the next city in the search and the path that it took to get there
+			currentNode = searchQueue.poll();
+		}
+
+		return currentNode;
+    }
 }
